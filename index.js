@@ -26,6 +26,8 @@ async function erc20Indexer() {
     
     const currentBlockNumber = await web3.eth.getBlockNumber();
 
+    console.log("Data fetching started...");
+
     // Fetching the transfer event
     contract.getPastEvents("Transfer", {
         fromBlock: currentBlockNumber - BigInt(100),
@@ -52,18 +54,17 @@ async function erc20Indexer() {
             const toAddress = event.returnValues.to.toString();
             const value = event.returnValues.value;
 
-            // var insertQuery = `INSERT INTO erc20_events VALUES (${from_address}, ${to_address}, ${value})`;
             var insertQuery = "INSERT INTO erc20_events VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)";
 
-            // console.log(from_address, to_address, value);
             db.query(insertQuery,[address, blockHash, blockNumber, data, transactionHash, signature, fromAddress, toAddress, value],(err) => {
                 if (err) {
                     console.error('Error inserting data into database:', err);
                 }
             })
         }
-        console.log("data fetch complete");
+        console.log("Data fetched and saved to Database successfully ✅");
     }
+
 }
 
 erc20Indexer();
